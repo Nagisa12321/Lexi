@@ -1,6 +1,6 @@
 #ifndef COMPOSITOR_H
 #define COMPOSITOR_H
-#include "Composition.h"
+#include "Glyph.h"
 
 class Composition;
 class Compositor {
