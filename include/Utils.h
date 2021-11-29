@@ -9,4 +9,6 @@ void container_printer(_Iterator first, _Iterator end, std::ostream &out = std::
     out << "]" << std::endl;
 }
 
+void lexi_abort(const char *info);
+
 #endif // UTILS_H

@@ -58,3 +58,8 @@ Glyph *Composition::child(int index) {
 Glyph *Composition::parent() {
     return m_parent;
 }
+
+void Composition::process_event(const Event &event) {
+    for (Glyph *g : m_components)
+        g->process_event(event);
+}

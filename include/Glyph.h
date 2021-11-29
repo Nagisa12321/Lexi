@@ -2,6 +2,7 @@
 #define GLYPH_H
 #include <list>
 #include "Types.h"
+#include "Events.h"
 
 class WindowRect;
 class Point;
@@ -33,6 +34,8 @@ public:
     virtual Glyph *child(int index) = 0;
     // get my parent
     virtual Glyph *parent() = 0;
+
+    virtual void process_event(const Event &event) = 0;
 protected:
     WindowRect m_rect;
 };
@@ -51,6 +54,8 @@ public:
     void insert(Glyph *child, int index) override;
     void add(Glyph *child) override;
     void remove(Glyph *child) override;
+    void process_event(const Event &event) override;
+
     Glyph *child(int index) override;
     Glyph *parent() override;
 

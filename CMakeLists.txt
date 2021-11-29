@@ -9,13 +9,23 @@ message(STATUS "start project....")
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# debug mode
+add_compile_options(-g)
+
+# Add SDL2 CMake modules
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
+
 # the .h files
 add_library(lexi_interface INTERFACE)
-target_include_directories(lexi_interface INTERFACE include include/_linux)
+target_include_directories(lexi_interface INTERFACE include/_linux include)
 
 # include SDL2
 find_package(SDL2 REQUIRED)
 include_directories(${project_name} ${SDL2_INCLUDE_DIRS})
+
+# include SDL2
+find_package(SDL2_ttf REQUIRED)
+include_directories(${project_name} ${SDL2_TTF_INCLUDE_DIRS})
 
 # project files
 set(PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/src)
@@ -23,7 +33,7 @@ set(PROJECT_SOURCES_LINUX ${PROJECT_SOURCE_DIR}/src/_linux)
 set(PROJECT_TESTS ${PROJECT_SOURCE_DIR}/test)
 FILE(GLOB LEXI_SOURCE_FILES ${PROJECT_SOURCES}/*.cpp)
 FILE(GLOB LEXI_SOURCE_LINUX_FILES ${PROJECT_SOURCES_LINUX}/*.cpp)
-FILE(GLOB LEXI_TEST_FILES ${PROJECT_TESTS}/*.cpp)
+FILE(GLOB LEXI_TEST_FILES ${PROJECT_TESTS}/*.c*)
 
 # show the file found
 message("\n============= now show files found =============")
@@ -45,10 +55,19 @@ endforeach()
 message("")
 message("")
 
+
+# tmp obj
+add_library(LEXI_SOURCE OBJECT ${LEXI_SOURCE_FILES})
+add_library(LEXI_SOURCE_LINUX_FILES OBJECT ${LEXI_SOURCE_LINUX_FILES})
+target_include_directories(LEXI_SOURCE INTERFACE include/_linux include)
+target_include_directories(LEXI_SOURCE_LINUX_FILES INTERFACE include/_linux include)
+target_link_libraries(LEXI_SOURCE PRIVATE lexi_interface ${SDL2_LIBRARIES} ${SDL2_TTF_LIBRARIES})
+target_link_libraries(LEXI_SOURCE_LINUX_FILES PRIVATE lexi_interface ${SDL2_LIBRARIES} ${SDL2_TTF_LIBRARIES})
+
 # add the executable
-add_executable(Lexi main.cpp ${LEXI_SOURCE_FILES} ${LEXI_SOURCE_LINUX_FILES})
+add_executable(${project_name} main.cpp $<TARGET_OBJECTS:LEXI_SOURCE> $<TARGET_OBJECTS:LEXI_SOURCE_LINUX_FILES>)
 # link
-target_link_libraries(${project_name} PRIVATE lexi_interface ${SDL2_LIBRARIES} SDL2)
+target_link_libraries(${project_name} PRIVATE lexi_interface ${SDL2_LIBRARIES} ${SDL2_TTF_LIBRARIES})
 
 # create the test files
 foreach(X ${LEXI_TEST_FILES})
@@ -56,8 +75,8 @@ foreach(X ${LEXI_TEST_FILES})
     string(REGEX REPLACE "\\.[^.]*$" "" cooked_name ${raw_name})
 
     message(STATUS "make and link the test file \"${cooked_name}\"")
-    add_executable(${cooked_name} ${X} ${LEXI_SOURCE_LINUX_FILES} ${LEXI_SOURCE_FILES})
-    target_link_libraries(${cooked_name} PRIVATE lexi_interface SDL2)
+    add_executable(${cooked_name} ${X} $<TARGET_OBJECTS:LEXI_SOURCE> $<TARGET_OBJECTS:LEXI_SOURCE_LINUX_FILES>)
+    target_link_libraries(${cooked_name} PRIVATE lexi_interface ${SDL2_LIBRARIES} ${SDL2_TTF_LIBRARIES})
 endforeach()
 
 # install
