@@ -6,7 +6,17 @@ using namespace std;
 Glyph::Glyph(const WindowRect &rect) 
     : m_rect(rect) {}
 
+Glyph::~Glyph() {}
+
 void Glyph::bounds(WindowRect &r) { r = m_rect; }
+
+bool Glyph::intersects(const Point &p) {
+    return p.x >= m_rect.x && 
+           p.y >= m_rect.y && 
+           (p.x - m_rect.x) < m_rect.width && 
+           (p.y - m_rect.y) < m_rect.height;
+}
+
 
 //////////////////////
 // Composition impl //
@@ -15,6 +25,8 @@ Composition::Composition(const WindowRect &rect, Glyph *parent)
     : Glyph(rect),
       m_components(),
       m_parent(parent) {}
+
+Composition::~Composition() {}
 
 void Composition::draw(Window *w) {
     for (Glyph *g : m_components)

@@ -21,7 +21,7 @@ public:
     void bounds(WindowRect &r);
 
     /* Click to detect */
-    virtual bool intersects(const Point &p) = 0;
+    virtual bool intersects(const Point &p);
 
     /* struct */
     // insert a child in index 
@@ -47,12 +47,12 @@ public:
     Composition(const Composition &) = delete;
     Composition &operator=(const Composition &) = delete;
 
-    void draw(Window *w);
-    void insert(Glyph *child, int index);
-    void add(Glyph *child);
-    void remove(Glyph *child);
-    Glyph *child(int index);
-    Glyph *parent();
+    void draw(Window *w) override;
+    void insert(Glyph *child, int index) override;
+    void add(Glyph *child) override;
+    void remove(Glyph *child) override;
+    Glyph *child(int index) override;
+    Glyph *parent() override;
 
 private:
     std::list<Glyph *>  m_components;

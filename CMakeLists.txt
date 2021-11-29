@@ -17,13 +17,36 @@ target_include_directories(lexi_interface INTERFACE include include/_linux)
 find_package(SDL2 REQUIRED)
 include_directories(${project_name} ${SDL2_INCLUDE_DIRS})
 
-set(PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/src/_linux)
+# project files
+set(PROJECT_SOURCES ${PROJECT_SOURCE_DIR}/src)
+set(PROJECT_SOURCES_LINUX ${PROJECT_SOURCE_DIR}/src/_linux)
 set(PROJECT_TESTS ${PROJECT_SOURCE_DIR}/test)
 FILE(GLOB LEXI_SOURCE_FILES ${PROJECT_SOURCES}/*.cpp)
+FILE(GLOB LEXI_SOURCE_LINUX_FILES ${PROJECT_SOURCES_LINUX}/*.cpp)
 FILE(GLOB LEXI_TEST_FILES ${PROJECT_TESTS}/*.cpp)
 
+# show the file found
+message("\n============= now show files found =============")
+message(" > source files: ")
+foreach(X ${LEXI_SOURCE_FILES})
+    get_filename_component(raw_name ${X} NAME)
+    message("${raw_name}")
+endforeach()
+message("\n > source files(linux): ")
+foreach(X ${LEXI_SOURCE_LINUX_FILES})
+    get_filename_component(raw_name ${X} NAME)
+    message("${raw_name}")
+endforeach()
+message("\n > test files: ")
+foreach(X ${LEXI_TEST_FILES})
+    get_filename_component(raw_name ${X} NAME)
+    message("${raw_name}")
+endforeach()
+message("")
+message("")
+
 # add the executable
-add_executable(Lexi main.cpp ${LEXI_SOURCE_FILES})
+add_executable(Lexi main.cpp ${LEXI_SOURCE_FILES} ${LEXI_SOURCE_LINUX_FILES})
 # link
 target_link_libraries(${project_name} PRIVATE lexi_interface ${SDL2_LIBRARIES} SDL2)
 
@@ -33,7 +56,7 @@ foreach(X ${LEXI_TEST_FILES})
     string(REGEX REPLACE "\\.[^.]*$" "" cooked_name ${raw_name})
 
     message(STATUS "make and link the test file \"${cooked_name}\"")
-    add_executable(${cooked_name} ${X} ${LEXI_SOURCE_FILES})
+    add_executable(${cooked_name} ${X} ${LEXI_SOURCE_LINUX_FILES} ${LEXI_SOURCE_FILES})
     target_link_libraries(${cooked_name} PRIVATE lexi_interface SDL2)
 endforeach()
 
