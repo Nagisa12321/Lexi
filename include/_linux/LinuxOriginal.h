@@ -1,7 +1,7 @@
 #ifndef LINUXORIGINAL_H
 #define LINUXORIGINAL_H
 #include "Original.h"
-#include "SDL2/SDL.h"
+#include "SDL.h"
 #include "Types.h"
 
 extern const SDL_Color button_default_color;
@@ -23,6 +23,10 @@ public:
     Glyph *parent() override;
 
 private:
+    void draw_normal(Window *w);
+    void draw_pressed(Window *w);
+
+    bool m_down;
 };
 
 class Color;

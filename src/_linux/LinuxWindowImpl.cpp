@@ -50,3 +50,7 @@ void LinuxWindowImpl::fill_rect(const WindowRect &rect, const Color &c) {
 void LinuxWindowImpl::draw_text(const Point &p, const std::string &text, const FontSize &fs) {
     m_text_writer->write(p, text.c_str(), fs);
 }
+
+SDL_Window *LinuxWindowImpl::get_window() {
+    return m_window;
+}

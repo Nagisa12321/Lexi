@@ -30,5 +30,9 @@ void Window::draw_text(const Point &p, const std::string &text, const FontSize &
     m_window_impl->draw_text(p, text, fs);
 }
 
+WindowImpl *Window::get_impl() {
+    return m_window_impl;
+}
+
 
 WindowImpl::~WindowImpl() {}

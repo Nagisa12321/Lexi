@@ -10,6 +10,7 @@ public:
     ~Button() = default;
 protected:
     std::string m_name;
+    bool m_pressed;
 };
 
 #endif // ORIGINAL_H

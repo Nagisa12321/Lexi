@@ -1,4 +1,4 @@
-#include "SDL2/SDL.h"
+#include "SDL.h"
 #include "Window.h"
 
 // definitely lost: 7,176 bytes in 4 blocks

@@ -59,8 +59,6 @@ message("")
 # tmp obj
 add_library(LEXI_SOURCE OBJECT ${LEXI_SOURCE_FILES})
 add_library(LEXI_SOURCE_LINUX_FILES OBJECT ${LEXI_SOURCE_LINUX_FILES})
-target_include_directories(LEXI_SOURCE INTERFACE include/_linux include)
-target_include_directories(LEXI_SOURCE_LINUX_FILES INTERFACE include/_linux include)
 target_link_libraries(LEXI_SOURCE PRIVATE lexi_interface ${SDL2_LIBRARIES} ${SDL2_TTF_LIBRARIES})
 target_link_libraries(LEXI_SOURCE_LINUX_FILES PRIVATE lexi_interface ${SDL2_LIBRARIES} ${SDL2_TTF_LIBRARIES})
 

@@ -3,14 +3,13 @@
 #include "Types.h"
 
 enum EventType {
+    Event_MousePressEvent,
 };
 
 class Event {
 public:
     Event(const Point &p, const EventType &type);
-    Event(const Event &) = delete;
     virtual ~Event() = default;
-    Event &operator=(const Event &) = delete;
 
     const EventType &get_event_type() const;
     const Point &get_event_point() const;
@@ -19,4 +18,11 @@ private:
     EventType m_event_type;
 };
 
+class MousePressEvent : public Event {
+public:
+    MousePressEvent(const Point &p, bool down);
+    bool down() const;
+private:
+    bool m_down;
+};
 #endif // EVENTS_H

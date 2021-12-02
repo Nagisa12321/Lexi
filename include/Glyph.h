@@ -59,7 +59,7 @@ public:
     Glyph *child(int index) override;
     Glyph *parent() override;
 
-private:
+protected:
     std::list<Glyph *>  m_components;
     Glyph               *m_parent;
 };

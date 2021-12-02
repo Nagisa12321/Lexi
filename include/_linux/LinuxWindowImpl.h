@@ -1,7 +1,7 @@
 #ifndef LINUXWINDOWIMPL_H
 #define LINUXWINDOWIMPL_H
 #include "Window.h"
-#include "SDL2/SDL.h"
+#include "SDL.h"
 #include "LinuxWriter.h"
 #include "Types.h"
 
@@ -14,7 +14,7 @@ public:
     void draw_rect(const WindowRect &rect, const Color &c) override;
     void fill_rect(const WindowRect &rect, const Color &c) override;
     void draw_text(const Point &p, const std::string &text, const FontSize &fs) override;
-
+    SDL_Window *get_window();
 private:
     SDL_Window      *m_window;
     SDL_Renderer    *m_render;

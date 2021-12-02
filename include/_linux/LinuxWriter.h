@@ -1,6 +1,6 @@
 #ifndef LINUXFONT_H
 #define LINUXFONT_H
-#include "SDL2/SDL_ttf.h"
+#include "SDL_ttf.h"
 #include "Types.h"
 
 extern const SDL_Color default_text_color;

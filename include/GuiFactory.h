@@ -15,6 +15,7 @@ public:
     virtual ~GuiFactory() = default;
     GuiFactory &operator=(const GuiFactory &) = delete;
 
+    Window *create_window(const WindowRect &rect, const std::string &name);
     virtual Button *create_button(const WindowRect &rect, const std::string &name)  = 0;
     virtual WindowImpl *create_window_impl(const WindowRect &rect, const char *title) = 0;
 

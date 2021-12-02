@@ -16,6 +16,7 @@ public:
     void draw_rect(const WindowRect &rect, const Color &c);
     void fill_rect(const WindowRect &rect, const Color &c);
     void draw_text(const Point &p, const std::string &text, const FontSize &fs);
+    WindowImpl *get_impl();
 private:    
     WindowImpl *m_window_impl;
 };
