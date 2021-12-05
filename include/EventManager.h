@@ -1,20 +1,28 @@
 #ifndef EVENTMANAGER_H
 #define EVENTMANAGER_H
 #include <vector>
+#include "GuiFactory.h"
 #include "Window.h"
 
 class EventManager {
 public:
-    EventManager(Window *window);
+    static void init_manager(const GuiFactory::OS &os, Window *win, int fps);
+    static EventManager *get_manager();
+    static void destory_manager();
     EventManager(const EventManager &) = delete;
     EventManager& operator=(const EventManager &) = delete;
     virtual ~EventManager();
-    void add_window(Window *window);
     virtual void loop() = 0;
+    virtual void stop() = 0;
+    void add_window(Window *window);
 protected:    
+    EventManager(Window *window);
     Window *m_main_window;
     Window *m_current_window;
     std::vector<Window *> m_child_windows;
+
+private:
+    static EventManager *manager;
 };
 
 #endif // EVENTMANAGER_H

@@ -43,7 +43,7 @@ protected:
 class Composition : public Glyph {
 public:
     Composition(const WindowRect &rect, Glyph *parent);
-    virtual ~Composition() = 0;
+    virtual ~Composition();
     /* the copy operatorion is defaultly deleted */
 
     // delete the copy operation;
@@ -61,6 +61,7 @@ public:
 
 protected:
     std::list<Glyph *>  m_components;
+    // TODO: safety delete the parent member;
     Glyph               *m_parent;
 };
 

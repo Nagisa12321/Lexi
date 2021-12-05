@@ -10,7 +10,7 @@ int main() {
     TTF_Init();
 
     // init gui factory
-    GuiFactory::set_factory(GuiFactory::OS::Linux);
+    GuiFactory::init_factory(GuiFactory::OS::Linux);
 
     Window *win1 = new Window({100, 100, 300, 300}, "test draw text");
     win1->draw_text({100, 100}, "hello wolrd!", FontSize::mid);

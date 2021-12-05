@@ -1,6 +1,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include <ostream>
 enum FontSize { max, mid, min };
 
 struct WindowRect {
@@ -20,4 +21,6 @@ struct Color {
     virtual unsigned char D() const = 0;
 };
 
+std::string to_string(const Point &point);
+std::string to_string(const WindowRect &rect);
 #endif // TYPES_H

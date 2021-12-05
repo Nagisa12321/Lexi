@@ -26,7 +26,10 @@ Composition::Composition(const WindowRect &rect, Glyph *parent)
       m_components(),
       m_parent(parent) {}
 
-Composition::~Composition() {}
+Composition::~Composition() {
+    for (Glyph *g : m_components)
+        delete g;
+}
 
 void Composition::draw(Window *w) {
     for (Glyph *g : m_components)

@@ -1,4 +1,7 @@
 #include "LinuxWindowImpl.h"
+#include "Commands.h"
+#include "LinuxCommands.h"
+#include <cstdio>
 using namespace std;
 
 LinuxWindowImpl::LinuxWindowImpl(const WindowRect &rect, const char *title)
@@ -14,10 +17,9 @@ LinuxWindowImpl::LinuxWindowImpl(const WindowRect &rect, const char *title)
                                   SDL_RENDERER_ACCELERATED)),
       m_text_writer(new LinuxWriter("../ttfs/UbuntuMono.ttf", m_render))
 {
+    printf("init!\n");
     // clean the screen
-    SDL_SetRenderDrawColor(m_render, 0xff, 0xff, 0xff, 0xff);
-    SDL_RenderFillRect(m_render, NULL);
-    SDL_RenderPresent(m_render);
+    CommandQueueManager::get_manager()->get_randering_queue()->put(new CleanScreen(m_render));
 }
 
 LinuxWindowImpl::~LinuxWindowImpl() {
@@ -27,28 +29,19 @@ LinuxWindowImpl::~LinuxWindowImpl() {
 }
 
 void LinuxWindowImpl::draw_line(const Point &p1, const Point &p2, const Color &c) {
-    SDL_SetRenderDrawColor(m_render, c.R(), c.G(), c.B(), c.D());
-    SDL_RenderDrawLine(m_render, p1.x, p1.y, p2.x, p2.y);
-    SDL_RenderPresent(m_render);
+    CommandQueueManager::get_manager()->get_randering_queue()->put(new DrawLine(m_render, p1, p2, c));
 }
 
 void LinuxWindowImpl::draw_rect(const WindowRect &rect, const Color &c) {
-    SDL_SetRenderDrawColor(m_render, c.R(), c.G(), c.B(), c.D());
-    SDL_Rect r{rect.x, rect.y, rect.width, rect.height};
-    SDL_RenderDrawRect(m_render, &r);
-    SDL_RenderPresent(m_render);
+    CommandQueueManager::get_manager()->get_randering_queue()->put(new DrawRect(m_render, rect, c));
 }
 
 void LinuxWindowImpl::fill_rect(const WindowRect &rect, const Color &c) {
-    SDL_SetRenderDrawColor(m_render, c.R(), c.G(), c.B(), c.D());
-    SDL_Rect r{rect.x, rect.y, rect.width, rect.height};
-    SDL_RenderFillRect(m_render, &r);
-    SDL_RenderPresent(m_render);
+    CommandQueueManager::get_manager()->get_randering_queue()->put(new FillRect(m_render, rect, c));
 }
 
-
 void LinuxWindowImpl::draw_text(const Point &p, const std::string &text, const FontSize &fs) {
-    m_text_writer->write(p, text.c_str(), fs);
+    CommandQueueManager::get_manager()->get_randering_queue()->put(new DrawText(m_text_writer, p, text, fs));
 }
 
 SDL_Window *LinuxWindowImpl::get_window() {
