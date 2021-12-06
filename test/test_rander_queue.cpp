@@ -1,5 +1,6 @@
 #include "Commands.h"
 #include "EventManager.h"
+#include "LinuxCommands.h"
 #include "Original.h"
 #include "Window.h"
 #include "SDL.h"
@@ -21,27 +22,29 @@ int main() {
     Window *main_window = GuiFactory::get_factory()->create_window({100, 100, 400, 400}, "main window");
     EventManager::init_manager(GuiFactory::OS::Linux, main_window, 60);
 
+
     Button *button1 = GuiFactory::get_factory()->create_button({100, 300, 200, 80}, "this is a button");
     main_window->add(button1);
     main_window->draw(main_window); 
 
-    auto drawer = [] {
+    bool running = true;
+    QuitCommand *quit = new QuitCommand(&running);
+    auto drawer = [&] {
         Command *c;
-        for (;;) {
+        for (; running;) {
             c = CommandQueueManager::get_manager()->get_randering_queue()->take();
-            if (c) { c->exec(); delete c; }
-            else break;
+            c->exec(); 
+            delete c;
         }
     };
 
     std::thread t1(drawer);
     EventManager::get_manager()->loop();
 
-    EventManager::destory_manager();
-    CommandQueueManager::get_manager()->get_randering_queue()->clear();
-
+    CommandQueueManager::get_manager()->get_randering_queue()->put(quit);
     t1.join();
 
+    EventManager::destory_manager();
     CommandQueueManager::destory_manager();
     TTF_Quit();
     SDL_Quit();

@@ -1,4 +1,6 @@
 #include "Commands.h"
+#include "Logger.h"
+#include <cstdio>
 #include <mutex>
 #include <string>
 #include <iostream>
@@ -48,61 +50,31 @@ Semephore::~Semephore() { cv.notify_all(); }
 CommandQueue::CommandQueue(int count) 
     : m_free(count),
       m_product(0),
-      m_command_list(),
-      m_list_lock(),
-      m_cleared(false)
+      m_command_list()
 {
 
 }
 
 CommandQueue::~CommandQueue() {
-    for (Command *cmd : m_command_list)
+    for (Command *cmd : m_command_list) {
+        Logger::get_logger()->debug("warnning! there is still command in the queue.\n");
         delete cmd;
+    }
 }
 
 Command *CommandQueue::take() {
     Command *res;
     m_product.await();
-    // 'this' maybe have broken!
-    {
-        std::unique_lock<std::mutex> lk(m_list_lock);
-        if (m_cleared) return nullptr;
-        else {
-            res = m_command_list.front();
-            m_command_list.pop_front();
-        }
-    }
+    res = m_command_list.front();
+    m_command_list.pop_front();
     m_free.post();
     return res;
 }
 
 void CommandQueue::put(Command *cmd) {
     m_free.await();
-    {
-        std::unique_lock<std::mutex> lk(m_list_lock);
-        if (m_cleared) {
-            delete cmd;
-            return;
-        } else {
-            m_command_list.push_back(cmd);
-        }
-    }
+    m_command_list.push_back(cmd);
     m_product.post();
-}
-
-void CommandQueue::clear() {
-    {
-        std::unique_lock<std::mutex> lk(m_list_lock);
-        m_cleared = true;
-        for (Command *cmd : m_command_list)
-            delete cmd;
-        m_command_list.clear();
-    }
-
-    // wake up
-    m_free.post();
-    m_product.post();
-    cout << "clear() ok" << endl;
 }
 
 void CommandQueueManager::init_manager() {

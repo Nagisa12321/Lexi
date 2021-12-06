@@ -28,9 +28,7 @@ int main() {
         Command *c;
         for (;;) {
             c = cq->take();
-            if (!c) break;
             c->exec();
-            std::cout << c << std::endl;
             delete c;
         }
     };
@@ -38,7 +36,6 @@ int main() {
     std::thread t1(run1), t2(run2);
     sleep(1);
 
-    cq->clear();
     t1.join();
     t2.join();
     delete cq;

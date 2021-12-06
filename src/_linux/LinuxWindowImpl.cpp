@@ -17,7 +17,6 @@ LinuxWindowImpl::LinuxWindowImpl(const WindowRect &rect, const char *title)
                                   SDL_RENDERER_ACCELERATED)),
       m_text_writer(new LinuxWriter("../ttfs/UbuntuMono.ttf", m_render))
 {
-    printf("init!\n");
     // clean the screen
     CommandQueueManager::get_manager()->get_randering_queue()->put(new CleanScreen(m_render));
 }

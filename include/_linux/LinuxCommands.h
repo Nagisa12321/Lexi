@@ -6,7 +6,26 @@
 #include "SDL.h"
 #include "Types.h"
 #include "SDL_render.h"
+#include "Logger.h"
+#include <cstdio>
 #include <string>
+
+class QuitCommand : public Command {
+public:
+    QuitCommand(bool *running)
+        : Command("kill command."),
+          m_running(running)
+    {
+
+    }
+    void exec() override {
+        Command::exec();
+        *m_running = false;
+    }
+    ~QuitCommand() = default;
+private:
+    bool *m_running;
+};
 
 class CleanScreen : public Command {
 public:
@@ -18,6 +37,7 @@ public:
     }
     void exec() override {
         Command::exec();
+        Logger::get_logger()->debug("m_renderer: %p\n",  m_renderer);
         SDL_SetRenderDrawColor(m_renderer, 0xff, 0xff, 0xff, 0xff);
         SDL_RenderFillRect(m_renderer, NULL);
         SDL_RenderPresent(m_renderer);
@@ -39,6 +59,7 @@ public:
     }
     void exec() override {
         Command::exec();
+        Logger::get_logger()->debug("m_renderer: %p\n",  m_renderer);
         SDL_SetRenderDrawColor(m_renderer, m_c.R(), m_c.G(), m_c.B(), m_c.D());
         SDL_Rect r{m_rect.x, m_rect.y, m_rect.width, m_rect.height};
         SDL_RenderDrawRect(m_renderer, &r);
@@ -63,6 +84,7 @@ public:
     }
     void exec() override {
         Command::exec();
+        Logger::get_logger()->debug("m_renderer: %p\n",  m_renderer);
         SDL_SetRenderDrawColor(m_renderer, m_c.R(), m_c.G(), m_c.B(), m_c.D());
         SDL_Rect r{m_rect.x, m_rect.y, m_rect.width, m_rect.height};
         SDL_RenderFillRect(m_renderer, &r);
@@ -88,6 +110,7 @@ public:
     }
     void exec() override {
         Command::exec();
+        Logger::get_logger()->debug("m_renderer: %p\n",  m_renderer);
         SDL_SetRenderDrawColor(m_renderer, m_c.R(), m_c.G(), m_c.B(), m_c.D());
         SDL_RenderDrawLine(m_renderer, m_p1.x, m_p1.y, m_p2.x, m_p2.y);
         SDL_RenderPresent(m_renderer);

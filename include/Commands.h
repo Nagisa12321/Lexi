@@ -39,13 +39,10 @@ public:
 
     Command *take();
     void put(Command *cmd);
-    void clear();
 private:
     Semephore m_free;
     Semephore m_product;
-    std::mutex m_list_lock;
     std::list<Command *> m_command_list;
-    bool m_cleared;
 };
 
 class CommandQueueManager {
