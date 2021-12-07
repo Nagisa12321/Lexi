@@ -25,7 +25,9 @@ int main() {
     EventManager *manager = EventManager::get_manager();
     manager->add_window(win2);
 
-    manager->loop();
+    bool running = true;
+    QuitCommand *quit = new QuitCommand(&running); 
+    manager->loop(quit);
     delete factory;
     delete manager;
 

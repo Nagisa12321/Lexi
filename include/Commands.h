@@ -1,5 +1,6 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
+#include <iostream>
 #include <string>
 #include <mutex>
 #include <condition_variable>
@@ -60,5 +61,23 @@ private:
     static CommandQueueManager *manager;
     CommandQueue *m_rendering_queue;
 };
+
+class QuitCommand : public Command {
+public:
+    QuitCommand(bool *running)
+        : Command("kill command."),
+          m_running(running)
+    {
+
+    }
+    void exec() override {
+        Command::exec();
+        *m_running = false;
+    }
+    ~QuitCommand() = default;
+private:
+    bool *m_running;
+};
+
 
 #endif // COMMANDS_H

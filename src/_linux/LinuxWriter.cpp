@@ -56,7 +56,6 @@ void LinuxWriter::write(const Point &p, const char *text, const FontSize &fs) {
     textRect.h = textSurface->h;
     textRect.x = p.x;
     textRect.y = p.y;
-    logger->debug("textRect: w=%d, h=%d\n", textRect.w, textRect.h);
 
     SDL_FreeSurface(textSurface);
 

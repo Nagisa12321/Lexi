@@ -8,7 +8,7 @@
 using namespace std;
 
 const int default_init_count = 100;
-bool Command::__debug = true;
+bool Command::__debug = false;
 CommandQueueManager *CommandQueueManager::manager = 0;
 
 

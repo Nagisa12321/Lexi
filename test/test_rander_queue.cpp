@@ -1,6 +1,7 @@
 #include "Commands.h"
 #include "EventManager.h"
 #include "LinuxCommands.h"
+#include "Logger.h"
 #include "Original.h"
 #include "Window.h"
 #include "SDL.h"
@@ -28,22 +29,16 @@ int main() {
     main_window->draw(main_window); 
 
     bool running = true;
-    QuitCommand *quit = new QuitCommand(&running);
-    auto drawer = [&] {
-        Command *c;
-        for (; running;) {
-            c = CommandQueueManager::get_manager()->get_randering_queue()->take();
-            c->exec(); 
-            delete c;
-        }
-    };
-
-    std::thread t1(drawer);
-    EventManager::get_manager()->loop();
-
-    CommandQueueManager::get_manager()->get_randering_queue()->put(quit);
-    t1.join();
-
+    QuitCommand *quit = new QuitCommand(&running); 
+    cout << "quit command: " << quit << endl;
+    EventManager::get_manager()->loop(quit);
+    Command *c;
+    for (; running;) {
+        c = CommandQueueManager::get_manager()->get_randering_queue()->take();
+        c->exec(); 
+        delete c;
+    }
+    Logger::get_logger()->debug("end the randerer loop. \n");
     EventManager::destory_manager();
     CommandQueueManager::destory_manager();
     TTF_Quit();

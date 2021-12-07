@@ -15,8 +15,10 @@ int main() {
     EventManager::init_manager(GuiFactory::OS::Linux, window, 60);
     EventManager *manager = EventManager::get_manager();
 
+    bool running = true;
+    QuitCommand *quit = new QuitCommand(&running); 
     manager->add_window(fatory->create_window({500, 100, 400, 400}, "test window2"));
-    manager->loop();
+    manager->loop(quit);
     TTF_Quit();
     SDL_Quit(); 
 }   

@@ -3,6 +3,7 @@
 #include <vector>
 #include "GuiFactory.h"
 #include "Window.h"
+#include "Commands.h"
 
 class EventManager {
 public:
@@ -12,7 +13,7 @@ public:
     EventManager(const EventManager &) = delete;
     EventManager& operator=(const EventManager &) = delete;
     virtual ~EventManager();
-    virtual void loop() = 0;
+    virtual void loop(QuitCommand *quit) = 0;
     virtual void stop() = 0;
     void add_window(Window *window);
 protected:    

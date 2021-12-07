@@ -1,12 +1,15 @@
 #include "LinuxEvents.h"
+#include "Commands.h"
 #include "EventManager.h"
 #include "Events.h"
 #include "LinuxWindowImpl.h"
+#include "LinuxCommands.h"
 #include "SDL.h"
 #include "SDL_timer.h"
 #include "Window.h"
 #include <cstdio>
 #include <iostream>
+#include <unistd.h>
 #include <vector>
 #include <thread>
 using namespace std;
@@ -15,11 +18,17 @@ LinuxEventManager::LinuxEventManager(Window *window, int fps) :
     EventManager(window),
     m_fps(fps),
     m_running(true),
-    m_stopped(false) {
+    m_stopped(false),
+    m_event_thread()
+{
+
 }
 
-void LinuxEventManager::loop() {
-    auto run = [&] {
+void LinuxEventManager::loop(QuitCommand *quit) {
+    /* fix code here */
+    cout << "quit outside: " << quit << endl;
+    auto run = [=] {
+        cout << "quit inside: " << quit << endl;
         int delay = 1000 / m_fps;
         while (m_running) {
             SDL_Delay(delay);
@@ -83,17 +92,22 @@ void LinuxEventManager::loop() {
                 }
             }
         }
+
+        // put the quit event
+        CommandQueueManager::get_manager()->get_randering_queue()->put(quit);
+        cout << "put the quit." << endl;
+        m_stopped = true;
     };
 
 	std::thread t(run);
-	t.join();
-
-    m_stopped = true;
+    m_event_thread.swap(t);
 }
 
 
 void LinuxEventManager::stop() {
     m_running = false;
+    m_event_thread.join();
+
     while (!m_stopped)
         ;
 
