@@ -28,7 +28,6 @@ void LinuxButton::draw(Window *w) {
 }
 
 void LinuxButton::draw_normal(Window *w) {
-    printf("draw normal\n");
     int text_width = m_name.size() * linux_min_font_size / 2;
     int x_start = (m_rect.width - text_width) / 2;
     int y_start = (m_rect.height - linux_min_font_size) / 2;
@@ -38,7 +37,6 @@ void LinuxButton::draw_normal(Window *w) {
 }
 
 void LinuxButton::draw_pressed(Window *w) {
-    printf("draw pressed\n");
     int text_width = m_name.size() * linux_min_font_size / 2;
     int x_start = (m_rect.width - text_width) / 2;
     int y_start = (m_rect.height - linux_min_font_size) / 2;
@@ -52,9 +50,8 @@ void LinuxButton::draw_pressed(Window *w) {
 void LinuxButton::process_event(const Event &event) {
     const MousePressEvent &e = dynamic_cast<const MousePressEvent &>(event);
     if (intersects(e.get_event_point())) {
-        printf("pressed!!!\n");
-        if (e.down()) { m_down = true; }
-        else { m_down = false; }   
+        if (e.down()) { m_down = true; m_press_handler(); }
+        else { m_down = false; m_release_handler(); }   
     }
 
 }

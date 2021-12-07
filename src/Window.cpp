@@ -1,4 +1,5 @@
 #include "Window.h"
+#include "Glyph.h"
 #include "LinuxWindowImpl.h"
 #include "GuiFactory.h"
 using namespace std;
@@ -29,6 +30,20 @@ void Window::fill_rect(const WindowRect &rect, const Color &c) {
 void Window::draw_text(const Point &p, const std::string &text, const FontSize &fs) {
     m_window_impl->draw_text(p, text, fs);
 }
+
+void Window::draw_cycle(const Point &p, int radius, const Color &c) {
+    m_window_impl->draw_cycle(p, radius, c);
+}
+
+void Window::fill_cycle(const Point &p, int radius, const Color &c) {
+    m_window_impl->fill_cycle(p, radius, c);
+}
+
+void Window::add(Glyph *child) {
+    Composition::add(child);
+    draw(this);
+}
+
 
 WindowImpl *Window::get_impl() {
     return m_window_impl;

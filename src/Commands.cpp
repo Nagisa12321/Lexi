@@ -8,8 +8,8 @@
 using namespace std;
 
 const int default_init_count = 100;
-bool Command::__debug = false;
-CommandQueueManager *CommandQueueManager::manager = 0;
+bool Command::__debug = true;
+BlockingQueueManager *BlockingQueueManager::manager = 0;
 
 
 Command::Command(std::string command_name)
@@ -42,62 +42,43 @@ void Semephore::await() {
 
 void Semephore::post() {
     std::unique_lock<std::mutex> lk(m);
-    if (++count <= 0) { cv.notify_all(); }
+    if (++count <= 0) { cv.notify_one(); }
 }
 
 Semephore::~Semephore() { cv.notify_all(); }
 
-CommandQueue::CommandQueue(int count) 
-    : m_free(count),
-      m_product(0),
-      m_command_list()
-{
-
-}
-
-CommandQueue::~CommandQueue() {
-    for (Command *cmd : m_command_list) {
-        Logger::get_logger()->debug("warnning! there is still command in the queue.\n");
-        delete cmd;
-    }
-}
-
-Command *CommandQueue::take() {
-    Command *res;
-    m_product.await();
-    res = m_command_list.front();
-    m_command_list.pop_front();
-    m_free.post();
-    return res;
-}
-
-void CommandQueue::put(Command *cmd) {
-    m_free.await();
-    m_command_list.push_back(cmd);
-    m_product.post();
-}
-
-void CommandQueueManager::init_manager() {
+void BlockingQueueManager::init_manager() {
     // static CommandQueueManager m;
     // manager = &m;
-    manager = new CommandQueueManager();
+    manager = new BlockingQueueManager();
 }
 
-CommandQueueManager *CommandQueueManager::get_manager() {
+BlockingQueueManager *BlockingQueueManager::get_manager() {
     return manager;
 }
 
-CommandQueueManager *CommandQueueManager::destory_manager() {
+void BlockingQueueManager::destory_manager() {
     delete manager;
 }
 
 
-CommandQueueManager::CommandQueueManager()
-    : m_rendering_queue(new CommandQueue(default_init_count))
+BlockingQueueManager::BlockingQueueManager()
+    : m_rendering_queue(new BlockQueue<Command *>(default_init_count)),
+      m_tasks_queue(new BlockQueue<Command *>(default_init_count)),
+      m_new_window_queue(new BlockQueue<Window *>(default_init_count)),
+      m_delete_window_queue(new BlockQueue<Window *>(default_init_count))
 {
 
 }
 
-CommandQueueManager::~CommandQueueManager() { delete m_rendering_queue; }
+BlockingQueueManager::~BlockingQueueManager() { 
+    delete m_rendering_queue; 
+    delete m_new_window_queue; 
+    delete m_delete_window_queue; 
+    delete m_tasks_queue; 
+}
 
-CommandQueue *CommandQueueManager::get_randering_queue() { return m_rendering_queue; }
+BlockQueue<Command *> *BlockingQueueManager::get_randering_queue() { return m_rendering_queue; }
+BlockQueue<Command *> *BlockingQueueManager::get_task_queue() { return m_tasks_queue; }
+BlockQueue<Window *> *BlockingQueueManager::get_new_window_queue() { return m_new_window_queue; }
+BlockQueue<Window *> *BlockingQueueManager::get_delete_window_queue() { return m_new_window_queue; }

@@ -14,6 +14,8 @@ public:
     void draw_rect(const WindowRect &rect, const Color &c) override;
     void fill_rect(const WindowRect &rect, const Color &c) override;
     void draw_text(const Point &p, const std::string &text, const FontSize &fs) override;
+    void draw_cycle(const Point &p, int radius, const Color &c) override;
+    void fill_cycle(const Point &p, int radius, const Color &c) override;
     SDL_Window *get_window();
 private:
     SDL_Window      *m_window;

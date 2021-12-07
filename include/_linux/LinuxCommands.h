@@ -7,6 +7,7 @@
 #include "Types.h"
 #include "SDL_render.h"
 #include "Logger.h"
+#include "Window.h"
 #include <cstdio>
 #include <string>
 class CleanScreen : public Command {
@@ -19,7 +20,6 @@ public:
     }
     void exec() override {
         Command::exec();
-        Logger::get_logger()->debug("m_renderer: %p\n",  m_renderer);
         SDL_SetRenderDrawColor(m_renderer, 0xff, 0xff, 0xff, 0xff);
         SDL_RenderFillRect(m_renderer, NULL);
         SDL_RenderPresent(m_renderer);
@@ -124,6 +124,100 @@ private:
     std::string m_text;
     FontSize m_fs;
 };
+
+class DrawCycle : public Command {
+public:
+    DrawCycle(SDL_Renderer *renderer, const Point &p, int radius, const Color &c)
+        : Command("draw cycle: " + to_string(p) + ", " + std::to_string(radius)),
+          m_renderer(renderer),
+          m_p(p),
+          m_radius(radius),
+          m_c(dynamic_cast<const LinuxColor &>(c))
+    {
+
+    }
+    void exec() override {
+        Command::exec();
+        SDL_SetRenderDrawColor(m_renderer, m_c.R(), m_c.G(), m_c.B(), m_c.D());
+        int m_pos_x = m_p.x;
+        int m_pos_y = m_p.y;
+        // draw cycle
+        for (int x = 0; x <= m_radius; ++x) {
+            int _y = sqrt(pow(m_radius, 2) - pow((double) x, 2));
+            SDL_RenderDrawPoint(m_renderer, m_pos_x + x, m_pos_y + _y);
+            SDL_RenderDrawPoint(m_renderer, m_pos_x -x,  m_pos_y + _y);
+            SDL_RenderDrawPoint(m_renderer, m_pos_x + x, m_pos_y - _y);
+            SDL_RenderDrawPoint(m_renderer, m_pos_x - x, m_pos_y - _y);
+        }
+        for (int _y = 0; _y <= m_radius; ++_y) {
+            int x = sqrt(pow(m_radius, 2) - pow((double) _y, 2));
+            SDL_RenderDrawPoint(m_renderer, m_pos_x + x, m_pos_y + _y);
+            SDL_RenderDrawPoint(m_renderer, m_pos_x -x,  m_pos_y + _y);
+            SDL_RenderDrawPoint(m_renderer, m_pos_x + x, m_pos_y - _y);
+            SDL_RenderDrawPoint(m_renderer, m_pos_x - x, m_pos_y - _y);
+        }
+        SDL_RenderPresent(m_renderer);
+    }
+private:
+    SDL_Renderer *m_renderer;
+    Point m_p;
+    int m_radius;
+    LinuxColor m_c;
+};
+
+class FillCycle : public Command {
+public:
+    FillCycle(SDL_Renderer *renderer, const Point &p, int radius, const Color &c)
+        : Command("draw cycle: " + to_string(p) + ", " + std::to_string(radius)),
+          m_renderer(renderer),
+          m_p(p),
+          m_radius(radius),
+          m_c(dynamic_cast<const LinuxColor &>(c))
+    {
+
+    }
+    void exec() override {
+        Command::exec();
+        SDL_SetRenderDrawColor(m_renderer, m_c.R(), m_c.G(), m_c.B(), m_c.D());
+        int m_pos_x = m_p.x;
+        int m_pos_y = m_p.y;
+        // fill cycle
+        for (int x = 0; x <= m_radius; ++x) {
+            int _y = sqrt(pow(m_radius, 2) - pow((double) x, 2));
+            SDL_RenderDrawLine(m_renderer,  m_pos_x + x,  m_pos_y + _y,  m_pos_x + x, m_pos_y - _y);
+            SDL_RenderDrawLine(m_renderer,  m_pos_x - x,  m_pos_y + _y,  m_pos_x - x, m_pos_y - _y);
+        }
+        SDL_RenderPresent(m_renderer);
+    }
+private:
+    SDL_Renderer *m_renderer;
+    Point m_p;
+    int m_radius;
+    LinuxColor m_c;
+};
+
+class ProcessEvent : public Command {
+public:
+    /* TODO: out put the event name */
+    ProcessEvent(Window *window, Event *event) 
+        : Command("process event"),
+          m_window(window),
+          m_event(event) 
+    {
+
+    }
+
+    void exec() override {
+        Command::exec();
+        m_window->process_event(*m_event);
+    }
+
+    ~ProcessEvent() { delete m_event; }
+private:
+    Window *m_window;
+    Event *m_event;
+};
+
 
 
 #endif // LINUXCOMMANDS_H

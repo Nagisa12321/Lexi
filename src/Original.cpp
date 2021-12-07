@@ -10,7 +10,7 @@ std::string to_string(const Point &point) {
 	res += to_string(point.x);
 	res += ", ";
 	res += to_string(point.y);
-	res += "[";
+	res += "]";
 	return res;
 }
 
@@ -28,11 +28,11 @@ std::string to_string(const WindowRect &rect) {
 	return res;
 }
 
-
+static void __fn() {}
 Button::Button(const WindowRect &rect, const std::string &name)
     : Glyph(rect),
-      m_press_handler(),
-      m_release_handler(),
+      m_press_handler(__fn),
+      m_release_handler(__fn),
       m_name(name),
       m_pressed(false)
 {

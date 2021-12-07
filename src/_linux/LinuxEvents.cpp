@@ -14,8 +14,8 @@
 #include <thread>
 using namespace std;
 
-LinuxEventManager::LinuxEventManager(Window *window, int fps) :
-    EventManager(window),
+LinuxEventListener::LinuxEventListener(Window *window, int fps) :
+    EventListener(window),
     m_fps(fps),
     m_running(true),
     m_stopped(false),
@@ -24,11 +24,16 @@ LinuxEventManager::LinuxEventManager(Window *window, int fps) :
 
 }
 
-void LinuxEventManager::loop(QuitCommand *quit) {
+void __delete_window(Window *win) {
+    if (!win) return;
+    BlockingQueueManager *manager = BlockingQueueManager::get_manager();
+    manager->get_delete_window_queue()->put(win);
+    manager->get_randering_queue()->put(new DeleteWindow());
+}
+
+void LinuxEventListener::loop() {
     /* fix code here */
-    cout << "quit outside: " << quit << endl;
     auto run = [=] {
-        cout << "quit inside: " << quit << endl;
         int delay = 1000 / m_fps;
         while (m_running) {
             SDL_Delay(delay);
@@ -36,12 +41,12 @@ void LinuxEventManager::loop(QuitCommand *quit) {
             while (SDL_PollEvent(&event)) {
                 switch (event.type) {
                 case SDL_QUIT:
-                    printf("exit!\n");
+                    printf("exit!\n");  
                     m_running = false;
                     break;
                 case SDL_WINDOWEVENT:
                     if (event.window.event == SDL_WINDOWEVENT_CLOSE) {
-                        printf("wndow close!\n");
+                        printf("window close!\n");
                         // ... Handle window close for each window ...
                         // Note, you can also check e.window.windowID to check which
                         // of your windows the event came from.
@@ -53,11 +58,13 @@ void LinuxEventManager::loop(QuitCommand *quit) {
                             break;
                         } else {
                             auto cur = m_child_windows.begin();
+                            /* TODO: fix bug here */
                             while (cur != m_child_windows.end()) {
                                 if (SDL_GetWindowID(((LinuxWindowImpl *)((*cur)->get_impl()))->get_window())
                                     == event.window.windowID) {
-                                    delete *cur;
+                                    __delete_window(*cur);
                                     m_child_windows.erase(cur);
+                                    m_current_window = m_main_window;
                                     break;
                                 }
                             }
@@ -69,11 +76,13 @@ void LinuxEventManager::loop(QuitCommand *quit) {
                     // 	event.motion.timestamp, event.motion.type, event.motion.which, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel);
                     break;
                 case SDL_MOUSEBUTTONUP:
-                    m_current_window->process_event(MousePressEvent({event.button.x, event.button.y}, false));
+                    EventExecutor::get_executor()->put_command(new ProcessEvent(m_current_window, 
+                        new MousePressEvent({event.button.x, event.button.y}, false)));
                     m_current_window->draw(m_current_window);
                     break;
                 case SDL_MOUSEBUTTONDOWN:
-                    m_current_window->process_event(MousePressEvent({event.button.x, event.button.y}, true));
+                    EventExecutor::get_executor()->put_command(new ProcessEvent(m_current_window, 
+                        new MousePressEvent({event.button.x, event.button.y}, true)));                    
                     m_current_window->draw(m_current_window);
                     break;
                 case SDL_MOUSEWHEEL:
@@ -83,18 +92,18 @@ void LinuxEventManager::loop(QuitCommand *quit) {
                 case SDL_KEYUP:
                     break;
                 case SDL_KEYDOWN:
-                    fprintf(stdout, "[%d ms] Keyboard\ttype:%d\twindowID:%d\tsym:%c\tmodifiers:%d\tstate:%d\trepeat:%d\n",
-                            event.key.timestamp, event.key.type, event.key.windowID, event.key.keysym.sym, event.key.keysym.mod, event.key.state, event.key.repeat);
+                    // fprintf(stdout, "[%d ms] Keyboard\ttype:%d\twindowID:%d\tsym:%c\tmodifiers:%d\tstate:%d\trepeat:%d\n",
+                    //         event.key.timestamp, event.key.type, event.key.windowID, event.key.keysym.sym, event.key.keysym.mod, event.key.state, event.key.repeat);
                     break;
                 default:
-                    fprintf(stdout, "Some event\n");
                     break;
                 }
             }
         }
 
         // put the quit event
-        CommandQueueManager::get_manager()->get_randering_queue()->put(quit);
+        RenderExecutor::destory_executor();
+
         cout << "put the quit." << endl;
         m_stopped = true;
     };
@@ -104,7 +113,7 @@ void LinuxEventManager::loop(QuitCommand *quit) {
 }
 
 
-void LinuxEventManager::stop() {
+void LinuxEventListener::stop() {
     m_running = false;
     m_event_thread.join();
 

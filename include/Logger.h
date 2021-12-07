@@ -2,7 +2,7 @@
 #define LOGGER_H
 #include <cstdio>
 #include <cstdarg>
-using namespace std;
+#include <thread>
 
 class Logger {
 public:

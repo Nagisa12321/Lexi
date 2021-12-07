@@ -18,7 +18,7 @@ public:
 };
 
 int main() {
-    CommandQueue *cq = new CommandQueue(2);
+    BlockQueue<Command *> *cq = new BlockQueue<Command *>(2);
     auto run1 = [&]() {
         for (int i = 0; i < 1000; ++i)
             cq->put(new AddCommand());
