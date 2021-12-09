@@ -3,6 +3,9 @@
 #include "Commands.h"
 #include "EventManager.h"
 #include <thread>
+#include <mutex>
+
+extern std::mutex __sdl_lock;
 
 class LinuxEventListener : public EventListener {
     friend class EventListener;

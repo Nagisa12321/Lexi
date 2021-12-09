@@ -21,7 +21,7 @@ Command::Command(std::string command_name)
 
 void Command::exec() {
     if (__debug)
-        cout << "run [" << m_command_name << "]" << endl; 
+        Logger::get_logger()->debug("run [%s] ....\n", m_command_name.c_str());
 }
 
 Command::~Command() { delete __m_debug; }

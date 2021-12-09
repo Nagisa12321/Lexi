@@ -16,6 +16,8 @@
 
 using namespace std;
 
+std::mutex m;
+
 GuiFactory *GuiFactory::get_factory() {
     if (!real_factory) { lexi_abort("you have not set the GUI factory!\n"); }
     return real_factory;

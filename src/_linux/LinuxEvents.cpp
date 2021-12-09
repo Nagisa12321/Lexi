@@ -9,10 +9,13 @@
 #include "Window.h"
 #include <cstdio>
 #include <iostream>
+#include <mutex>
 #include <unistd.h>
 #include <vector>
 #include <thread>
 using namespace std;
+
+mutex __sdl_lock;
 
 LinuxEventListener::LinuxEventListener(Window *window, int fps) :
     EventListener(window),
@@ -38,7 +41,15 @@ void LinuxEventListener::loop() {
         while (m_running) {
             SDL_Delay(delay);
             SDL_Event event;
-            while (SDL_PollEvent(&event)) {
+            for (;;) {
+                int __tmp;
+                {
+                    unique_lock<mutex> __lk(__sdl_lock);
+                    __tmp = SDL_PollEvent(&event);
+                    if (!__tmp)
+                        break;
+                }
+
                 switch (event.type) {
                 case SDL_QUIT:
                     printf("exit!\n");  

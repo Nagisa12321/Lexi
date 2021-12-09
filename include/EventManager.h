@@ -1,12 +1,14 @@
 #ifndef EVENTMANAGER_H
 #define EVENTMANAGER_H
 #include <iostream>
+#include <mutex>
 #include <vector>
 #include <thread>
 #include "GuiFactory.h"
 #include "Logger.h"
 #include "Window.h"
 #include "Commands.h"
+
 
 class EventListener {
 public:

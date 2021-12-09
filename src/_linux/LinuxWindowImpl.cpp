@@ -1,22 +1,30 @@
 #include "LinuxWindowImpl.h"
 #include "Commands.h"
 #include "LinuxCommands.h"
+#include "LinuxEvents.h"
 #include <cstdio>
+#include <mutex>
 using namespace std;
 
 LinuxWindowImpl::LinuxWindowImpl(const WindowRect &rect, const char *title)
     : WindowImpl(),
-      m_window(SDL_CreateWindow(title, 
-                                rect.x, 
-                                rect.y,
-                                rect.width,
-                                rect.height, 
-                                SDL_WINDOW_SHOWN)),
-      m_render(SDL_CreateRenderer(m_window, 
-                                  -1, 
-                                  SDL_RENDERER_ACCELERATED)),
-      m_text_writer(new LinuxWriter("../ttfs/UbuntuMono.ttf", m_render))
+      m_window(0),
+      m_render(0),
+      m_text_writer(0)
 {
+    {
+        unique_lock<mutex> __lk(__sdl_lock);
+        m_window = SDL_CreateWindow(title, 
+                                    rect.x, 
+                                    rect.y,
+                                    rect.width,
+                                    rect.height, 
+                                    SDL_WINDOW_SHOWN);
+        m_render = SDL_CreateRenderer(m_window, 
+                                    -1, 
+                                    SDL_RENDERER_ACCELERATED); 
+    }
+    m_text_writer = new LinuxWriter("../ttfs/UbuntuMono.ttf", m_render);
     // clean the screen
     BlockingQueueManager::get_manager()->get_randering_queue()->put(new CleanScreen(m_render));
 }
