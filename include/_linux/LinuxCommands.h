@@ -9,6 +9,7 @@
 #include "Logger.h"
 #include "Window.h"
 #include <cstdio>
+#include <functional>
 #include <string>
 class CleanScreen : public Command {
 public:
@@ -210,6 +211,7 @@ public:
     void exec() override {
         Command::exec();
         m_window->process_event(*m_event);
+        m_window->draw(m_window);    
     }
 
     ~ProcessEvent() { delete m_event; }
@@ -218,6 +220,21 @@ private:
     Event *m_event;
 };
 
+class HandlerExec : public Command {
+public:
+    HandlerExec(std::function<void()> __handler)
+        : Command("handler executor"),
+          m_handler(__handler)
+    {
 
+    }
+
+    void exec() override {
+        Command::exec();
+        m_handler();
+    }
+private: 
+    std::function<void()> m_handler;
+};
 
 #endif // LINUXCOMMANDS_H

@@ -13,6 +13,8 @@
 #include <unistd.h>
 #include <vector>
 #include <thread>
+#include <algorithm>
+
 using namespace std;
 
 mutex __sdl_lock;
@@ -26,6 +28,23 @@ LinuxEventListener::LinuxEventListener(Window *window, int fps) :
 {
 
 }
+
+void LinuxEventListener::close_window(Window *window) {
+    if (window == m_main_window) {
+        m_running = false;
+    } else {
+        __delete_window(window);
+        auto __iter = m_child_windows.begin();
+        while (__iter != m_child_windows.end()) {
+            if (*__iter == window) {
+                m_child_windows.erase(__iter);
+                break;
+            }
+        }
+        m_current_window = m_main_window;
+    }
+}
+
 
 void __delete_window(Window *win) {
     if (!win) return;
@@ -89,12 +108,10 @@ void LinuxEventListener::loop() {
                 case SDL_MOUSEBUTTONUP:
                     EventExecutor::get_executor()->put_command(new ProcessEvent(m_current_window, 
                         new MousePressEvent({event.button.x, event.button.y}, false)));
-                    m_current_window->draw(m_current_window);
                     break;
                 case SDL_MOUSEBUTTONDOWN:
                     EventExecutor::get_executor()->put_command(new ProcessEvent(m_current_window, 
                         new MousePressEvent({event.button.x, event.button.y}, true)));                    
-                    m_current_window->draw(m_current_window);
                     break;
                 case SDL_MOUSEWHEEL:
                     // fprintf(stdout, "[%d ms] MouseWheel\ttype:%d\tid:%d\tx:%d\ty:%d\n",

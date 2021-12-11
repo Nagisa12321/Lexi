@@ -21,7 +21,7 @@ int main() {
     GuiFactory::init_factory(GuiFactory::OS::Linux);
     BlockingQueueManager::init_manager();
     RenderExecutor::init_executor();
-    EventExecutor::init_executor(1);
+    EventExecutor::init_executor(3);
 
     Window *main_window = GuiFactory::get_factory()->create_window({100, 100, 400, 400}, "main window");
     EventListener::init_listener(GuiFactory::OS::Linux, main_window, 60);
@@ -30,12 +30,12 @@ int main() {
     button1->add_press_handler([] {
         cout << "I am pressed!" << endl;
         GuiFactory *factory = GuiFactory::get_factory();
+
         int res = factory->open_tips_window(GuiFactory::TipsWindowType::Ok, 0, 0, "test tip", "hello world!"); 
         if (res) cout << "the result is --- yes" << endl;
         else cout << "the result is --- no" << endl;
     });
     main_window->add(button1);
-    main_window->draw(main_window); 
 
     EventListener::get_listener()->loop();
     EventExecutor::get_executor()->start();

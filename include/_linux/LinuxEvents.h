@@ -12,6 +12,7 @@ class LinuxEventListener : public EventListener {
 public:
     void loop() override;
     void stop() override;
+    void close_window(Window *window) override;
 
 private:
     LinuxEventListener(Window *window, int fps);

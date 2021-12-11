@@ -64,28 +64,27 @@ static int __open_ok_window(Window *tips_window, const std::string &text) {
     Button *__yes = GuiFactory::get_factory()->create_button({100, 80, 50, 20}, "yes");
     Button *__no = GuiFactory::get_factory()->create_button({200, 80, 50, 20}, "no");
 
-    bool *__continue = new bool(false);
-    bool *__result = new bool;
-    __yes->add_press_handler([=] { 
+    int __res;
+    mutex __m;
+    condition_variable __cv;
+    unique_lock<mutex> __lk(__m);
+
+    __yes->add_press_handler([&] { 
         cout << "yes!" << endl; 
-        *__result = true;
-        *__continue = true;
+        __res = 1;
+        __cv.notify_all();
     });
-    __no->add_press_handler([=] { 
+    __no->add_press_handler([&] { 
         cout << "no!" << endl; 
-        *__result = false;
-        *__continue = true;
+        __res = 0;
+        __cv.notify_all();
     });
     tips_window->add(__yes);
     tips_window->add(__no);
-
-
-    while (!*__continue) 
-        ;
-
-    int __res = *__result;
-    delete __result;
-    delete __continue;
+    __cv.wait(__lk);
+    
+    EventListener::get_listener()->close_window(tips_window);
+    
     return __res;
 }
 
@@ -114,4 +113,5 @@ int GuiFactory::open_tips_window(const TipsWindowType &type,
     if (type == TipsWindowType::Ok)
         return __open_ok_window(tips_window, text);
     
+    return 1;
 }

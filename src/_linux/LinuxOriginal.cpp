@@ -1,5 +1,7 @@
 #include "LinuxOriginal.h"
+#include "EventManager.h"
 #include "GuiFactory.h"
+#include "LinuxCommands.h"
 #include "Window.h"
 #include "Events.h"
 #include "Utils.h"
@@ -46,12 +48,17 @@ void LinuxButton::draw_pressed(Window *w) {
 }
 
 
-
 void LinuxButton::process_event(const Event &event) {
     const MousePressEvent &e = dynamic_cast<const MousePressEvent &>(event);
     if (intersects(e.get_event_point())) {
-        if (e.down()) { m_down = true; m_press_handler(); }
-        else { m_down = false; m_release_handler(); }   
+        if (e.down()) { 
+            m_down = true; 
+            EventExecutor::get_executor()->put_command(new HandlerExec(m_press_handler));
+        }
+        else { 
+            m_down = false; 
+            EventExecutor::get_executor()->put_command(new HandlerExec(m_release_handler));
+        }   
     }
 
 }

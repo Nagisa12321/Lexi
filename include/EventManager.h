@@ -21,6 +21,7 @@ public:
     virtual void loop() = 0;
     virtual void stop() = 0;
     void add_window(Window *window);
+    virtual void close_window(Window *window) = 0;
 protected:    
     EventListener(Window *window);
     Window *m_main_window;
